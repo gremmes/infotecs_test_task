@@ -1,13 +1,6 @@
-const THeader = ({ onClick, sortRules}) => {
-  const sortHeadings = [
-    { key: 'lastName', value: 'Фамилия' },
-    { key: 'firstName', value: 'Имя' },
-    { key: 'maidenName', value: 'Отчество' },
-    { key: 'age', value: 'Возраст' },
-    { key: 'gender', value: 'Пол' },
-    { key: 'phone', value: 'Телефон' },
-  ];
+import { activeHeadings } from "./activeHeadings";
 
+const THeader = ({ onClick, sortRules }) => {
   const getSortLabel = ({ order }) => {
     if (order === 'asc') return '↑';
     if (order === 'desc') return '↓';
@@ -19,10 +12,10 @@ const THeader = ({ onClick, sortRules}) => {
   return (
     <thead>
       <tr>
-        {sortHeadings.map(header => (
+        {activeHeadings.map(header => (
           <th key={header.key} onClick={() => onClick(header.key)}>
             {header.value}
-            {header.key === sortRules.key&&<span>{sortLabel}</span>}
+            {header.key === sortRules.key && <span>{sortLabel}</span>}
           </th>
         ))}
         <th>Email</th>

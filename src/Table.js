@@ -1,13 +1,14 @@
 import './App.css';
 import React from 'react';
+import SearchForm from './SearchForm';
 import THeader from './THeader';
 import User from './User';
 import Footer from './Footer';
-import { searchParams } from './seachParams';
+import { searchQueryParams } from './seachParams';
 import { useState, useEffect } from 'react';
 
 const buildQueryString = () => {
-  const params = searchParams;
+  const params = searchQueryParams;
   const query = Object.values(params)
     .map((value) => `${encodeURIComponent(value)}`)
     .join(',');
@@ -19,6 +20,7 @@ const Table = () => {
   const [totalUsers, setTotalUsers] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [sortConfig, setSortConfig] = useState({ key: null, order: null});
+  const [filterConfig, setFilterConfig] = useState({ category: null, searchText: null });
   const usersPerPage = 10;
 
   const fetchData = async (page) => {
@@ -26,6 +28,10 @@ const Table = () => {
     
     const createQueryString = (baseUrl) => {
       const params = [];
+
+      if (filterConfig.category !== null && filterConfig.searchText !== null) {
+        params.push(`/filter?key=${encodeURIComponent(filterConfig.category)}&value=${encodeURIComponent(filterConfig.searchText)}`)
+      }
       
       if (sortConfig.key !== null) {
         params.push(`sortBy=${encodeURIComponent(sortConfig.key)}`);
@@ -33,7 +39,7 @@ const Table = () => {
           params.push(`order=${encodeURIComponent(sortConfig.order)}`);
         }
       }
-      params.push(`limit=${usersPerPage}`);
+      params.push(`?limit=${usersPerPage}`);
       params.push(`skip=${skip}`);
       params.push(`select=${buildQueryString()}`);
 
@@ -42,7 +48,8 @@ const Table = () => {
     }
 
     try {
-      const url = createQueryString('https://dummyjson.com/users?')
+      const url = createQueryString('https://dummyjson.com/users');
+      console.log(url);
       const response = await fetch(url);
       const result = await response.json();
       setUsers(result.users);
@@ -55,7 +62,7 @@ const Table = () => {
 
   useEffect(() => {
     fetchData(currentPage);
-  }, [currentPage, sortConfig]);
+  }, [currentPage, sortConfig, filterConfig]);
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
@@ -75,6 +82,10 @@ const Table = () => {
     });
   }
 
+  const handleFilterChange = ({ category, searchText}) => {
+    setFilterConfig({ category, searchText });
+  }
+
   const renderTableBody = () => (
     <tbody>
       {users.map(user => <User key={user.id} user={user} />)}
@@ -83,6 +94,9 @@ const Table = () => {
 
   return (
     <>
+      <SearchForm
+        onFilterChange={handleFilterChange}
+      />
       <table>
         <THeader
           onClick={handleSorting}

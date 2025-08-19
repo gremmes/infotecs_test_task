@@ -6,12 +6,6 @@ const Footer = ({ totalUsers, usersPerPage, onPageChange }) => {
   const maxNumPages = Math.ceil(totalUsers / usersPerPage);
   const [currentPage, setCurrentPage] = useState(1);
   const [pages, setPages] = useState([]);
-  const renderMiddleButtons = () => {
-    if (pages.length === 0) return null;
-    return(
-      <>{pages.map(page => <button key={page}>{page}</button>)}</>
-    )
-  };
 
   useEffect(() => {
     if (maxNumPages === 0) {

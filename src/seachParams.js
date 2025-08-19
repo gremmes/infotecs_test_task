@@ -1,4 +1,4 @@
-export const searchParams = {
+export const searchQueryParams = {
   фамилия: 'lastName',
   имя: 'firstName',
   отчество: 'maidenName',
