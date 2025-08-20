@@ -25,6 +25,7 @@ const Table = () => {
   const [filterConfig, setFilterConfig] = useState({ category: null, searchText: null });
   const [modal, setModal] = useState(false);
   const [userData, setUserData] = useState(null);
+  const [error, setError] = useState(null);
   const usersPerPage = 10;
 
   const fetchData = async (page) => {
@@ -56,11 +57,14 @@ const Table = () => {
     try {
       const url = createQueryString('https://dummyjson.com/users');
       const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`Ошибка сети: ${response.status} ${response.statusText}`);
+      }
       const result = await response.json();
       setUsers(result.users);
       setTotalUsers(result.total);
     } catch (err) {
-      console.log(err);
+      setError(err.message);
     }
   };
 
@@ -94,61 +98,69 @@ const Table = () => {
     }
   };
 
-  const toggle = async ( id ) => {
+  const toggle = async (id) => {
     if (modal === false) {
-    const getUser = async (userId) => {
-      const response = await fetch(`https://dummyjson.com/users/${userId}`)
-      const result = await response.json();
-      return result;
+      try {
+        const getUser = async (userId) => {
+          const response = await fetch(`https://dummyjson.com/users/${userId}`);
+          if (!response.ok) {
+            throw new Error(`Ошибка сети при получения пользователя: ${response.status} ${response.statusText}`);
+          }
+          const result = await response.json();
+          return result;
+        };
+        const userData = await getUser(id);
+        setUserData(userData);
+      } catch (err) {
+        setError(err.message);
+      }
     }
-    const userData = await getUser(id);
-    setUserData(userData);
-  }
-    setModal(!modal);
-  }
+      setModal(!modal);
+    };
 
-  const renderTableBody = () => (
-    <tbody>
-      {users.map(user => {
-      return (
-      <User key={user.id} user={user} toggle={toggle} />
-      )
-    })}
-    </tbody>
-  );
+    const renderTableBody = () => (
+      <tbody>
+        {users.map(user => {
+          return (
+            <User key={user.id} user={user} toggle={toggle} />
+          )
+        })}
+      </tbody>
+    );
 
-  return (
-    <>
-      <SearchForm
-        onFilterChange={handleFilterChange}
-      />
-      <table>
-        <THeader
-          onClick={handleSorting}
-          sortRules={sortConfig}
+    return (
+      <>
+        {error && <div className="error-message">{error}</div>}
+        <SearchForm
+          onFilterChange={handleFilterChange}
         />
-        {renderTableBody()}
-      </table>
-      <Footer
-        totalUsers={totalUsers}
-        usersPerPage={usersPerPage}
-        onPageChange={handlePageChange}
-      />
-      <Modal isOpen={modal}>
-        <Modal.Header toggle={toggle}>Информация о пользователе:</Modal.Header>
-        <Modal.Body user={userData} />
-        <Modal.Footer>
-          <button
-            type="button"
-            className="modal-close-button btn btn-secondary"
-            onClick={toggle}
-          >
-            Cancel
-          </button>
-        </Modal.Footer>
-      </Modal>
-    </>
-  );
-};
+        <table>
+          <THeader
+            onClick={handleSorting}
+            sortRules={sortConfig}
+          />
+          {renderTableBody()}
+        </table>
+        <Footer
+          totalUsers={totalUsers}
+          usersPerPage={usersPerPage}
+          onPageChange={handlePageChange}
+        />
+        <Modal isOpen={modal}>
+          <Modal.Header toggle={toggle}>Информация о пользователе:</Modal.Header>
+          <Modal.Body user={userData} />
+          <Modal.Footer>
+            <button
+              type="button"
+              className="modal-close-button btn btn-secondary"
+              onClick={toggle}
+            >
+              Cancel
+            </button>
+          </Modal.Footer>
+        </Modal>
+      </>
+    );
+  };
 
-export default Table;
+  export default Table;

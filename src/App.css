@@ -42,6 +42,10 @@ td {
   border-collapse: collapse;
 }
 
+.error-message {
+  color: red;
+}
+
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);
