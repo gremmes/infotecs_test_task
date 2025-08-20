@@ -1,4 +1,5 @@
 export const searchQueryParams = {
+  идентификатор: 'id',
   фамилия: 'lastName',
   имя: 'firstName',
   отчество: 'maidenName',

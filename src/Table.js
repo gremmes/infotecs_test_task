@@ -1,9 +1,11 @@
 import './App.css';
+import './Modal.css';
 import React from 'react';
 import SearchForm from './SearchForm';
 import THeader from './THeader';
 import User from './User';
 import Footer from './Footer';
+import Modal from './Modal';
 import { searchQueryParams } from './seachParams';
 import { useState, useEffect } from 'react';
 
@@ -19,27 +21,31 @@ const Table = () => {
   const [users, setUsers] = useState([]);
   const [totalUsers, setTotalUsers] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
-  const [sortConfig, setSortConfig] = useState({ key: null, order: null});
+  const [sortConfig, setSortConfig] = useState({ key: null, order: null });
   const [filterConfig, setFilterConfig] = useState({ category: null, searchText: null });
+  const [modal, setModal] = useState(false);
+  const [userData, setUserData] = useState(null);
   const usersPerPage = 10;
 
   const fetchData = async (page) => {
     const skip = (page - 1) * usersPerPage;
-    
+
     const createQueryString = (baseUrl) => {
       const params = [];
 
       if (filterConfig.category !== null && filterConfig.searchText !== null) {
         params.push(`/filter?key=${encodeURIComponent(filterConfig.category)}&value=${encodeURIComponent(filterConfig.searchText)}`)
+      } else {
+        params.push('?');
       }
-      
+
       if (sortConfig.key !== null) {
         params.push(`sortBy=${encodeURIComponent(sortConfig.key)}`);
         if (sortConfig.order !== null) {
           params.push(`order=${encodeURIComponent(sortConfig.order)}`);
         }
       }
-      params.push(`?limit=${usersPerPage}`);
+      params.push(`limit=${usersPerPage}`);
       params.push(`skip=${skip}`);
       params.push(`select=${buildQueryString()}`);
 
@@ -49,7 +55,6 @@ const Table = () => {
 
     try {
       const url = createQueryString('https://dummyjson.com/users');
-      console.log(url);
       const response = await fetch(url);
       const result = await response.json();
       setUsers(result.users);
@@ -58,7 +63,6 @@ const Table = () => {
       console.log(err);
     }
   };
-
 
   useEffect(() => {
     fetchData(currentPage);
@@ -80,17 +84,38 @@ const Table = () => {
         }
       }
     });
-  }
+  };
 
-  const handleFilterChange = ({ category, searchText}) => {
-    setFilterConfig({ category, searchText });
+  const handleFilterChange = ({ category, searchText }) => {
+    if (searchText === '') {
+      setFilterConfig({ category: null, searchText: null });
+    } else {
+      setFilterConfig({ category, searchText });
+    }
+  };
+
+  const toggle = async ( id ) => {
+    if (modal === false) {
+    const getUser = async (userId) => {
+      const response = await fetch(`https://dummyjson.com/users/${userId}`)
+      const result = await response.json();
+      return result;
+    }
+    const userData = await getUser(id);
+    setUserData(userData);
+  }
+    setModal(!modal);
   }
 
   const renderTableBody = () => (
     <tbody>
-      {users.map(user => <User key={user.id} user={user} />)}
+      {users.map(user => {
+      return (
+      <User key={user.id} user={user} toggle={toggle} />
+      )
+    })}
     </tbody>
-  )
+  );
 
   return (
     <>
@@ -109,6 +134,19 @@ const Table = () => {
         usersPerPage={usersPerPage}
         onPageChange={handlePageChange}
       />
+      <Modal isOpen={modal}>
+        <Modal.Header toggle={toggle}>Информация о пользователе:</Modal.Header>
+        <Modal.Body user={userData} />
+        <Modal.Footer>
+          <button
+            type="button"
+            className="modal-close-button btn btn-secondary"
+            onClick={toggle}
+          >
+            Cancel
+          </button>
+        </Modal.Footer>
+      </Modal>
     </>
   );
 };
