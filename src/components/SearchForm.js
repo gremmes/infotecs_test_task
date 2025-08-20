@@ -1,4 +1,4 @@
-import { activeHeadings } from "./activeHeadings";
+import { activeHeadings } from "../consts/activeHeadings";
 import { useState } from "react";
 
 const SearchForm = ({ onFilterChange }) => {
@@ -12,7 +12,7 @@ const SearchForm = ({ onFilterChange }) => {
 
   return (
     <form onSubmit={handleSubmit}>
-      <h4>Фильтр поиска:</h4>
+      <h3>Фильтр поиска:</h3>
       <select
         name="category"
         value={category}

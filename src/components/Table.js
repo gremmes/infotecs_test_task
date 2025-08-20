@@ -1,12 +1,12 @@
-import './App.css';
-import './Modal.css';
+import '../../src/App.css';
+import '../css/Modal.css';
 import React from 'react';
 import SearchForm from './SearchForm';
 import THeader from './THeader';
 import User from './User';
 import Footer from './Footer';
 import Modal from './Modal';
-import { searchQueryParams } from './seachParams';
+import { searchQueryParams } from '../consts/seachParams';
 import { useState, useEffect } from 'react';
 
 const buildQueryString = () => {
@@ -115,52 +115,48 @@ const Table = () => {
         setError(err.message);
       }
     }
-      setModal(!modal);
-    };
-
-    const renderTableBody = () => (
-      <tbody>
-        {users.map(user => {
-          return (
-            <User key={user.id} user={user} toggle={toggle} />
-          )
-        })}
-      </tbody>
-    );
-
-    return (
-      <>
-        {error && <div className="error-message">{error}</div>}
-        <SearchForm
-          onFilterChange={handleFilterChange}
-        />
-        <table>
-          <THeader
-            onClick={handleSorting}
-            sortRules={sortConfig}
-          />
-          {renderTableBody()}
-        </table>
-        <Footer
-          totalUsers={totalUsers}
-          usersPerPage={usersPerPage}
-          onPageChange={handlePageChange}
-        />
-        <Modal isOpen={modal}>
-          <Modal.Header toggle={toggle}>Информация о пользователе:</Modal.Header>
-          <Modal.Body user={userData} />
-          <Modal.Footer>
-            <button
-              type="button"
-              className="modal-close-button btn btn-secondary"
-              onClick={toggle}
-            >
-              Cancel
-            </button>
-          </Modal.Footer>
-        </Modal>
-      </>
-    );
+    setModal(!modal);
   };
 
-  export default Table;
+  const renderTableBody = () => (
+    <tbody>
+      {users.map(user => <User key={user.id} user={user} toggle={toggle} />)}
+    </tbody>
+  );
+
+  return (
+    <>
+      {error && <div className="error-message">{error}</div>}
+      <SearchForm
+        onFilterChange={handleFilterChange}
+      />
+      <table>
+        <THeader
+          onClick={handleSorting}
+          sortRules={sortConfig}
+        />
+        {renderTableBody()}
+      </table>
+      <Footer
+        totalUsers={totalUsers}
+        usersPerPage={usersPerPage}
+        onPageChange={handlePageChange}
+      />
+      <Modal isOpen={modal}>
+        <Modal.Header toggle={toggle}>Информация о пользователе:</Modal.Header>
+        <Modal.Body user={userData} />
+        <Modal.Footer>
+          <button
+            type="button"
+            className="modal-close-button btn btn-secondary"
+            onClick={toggle}
+          >
+            Cancel
+          </button>
+        </Modal.Footer>
+      </Modal>
+    </>
+  );
+};
+
+export default Table;

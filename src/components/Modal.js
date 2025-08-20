@@ -1,4 +1,4 @@
-import classNames from './classNames';
+import classNames from '../utils/classNames';
 
 const Header = ({ children }) => {
   return (

@@ -1,4 +1,4 @@
-import { activeHeadings } from "./activeHeadings";
+import { activeHeadings } from "../consts/activeHeadings";
 
 const THeader = ({ onClick, sortRules }) => {
   const getSortLabel = ({ order }) => {
