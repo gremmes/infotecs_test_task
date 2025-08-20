@@ -42,12 +42,6 @@ td {
   border-collapse: collapse;
 }
 
-.big-input, .big-select {
-  font-size: 1.2rem;
-  padding: 10px;
-  min-width: 200px;
-}
-
 .error-message {
   color: red;
 }
